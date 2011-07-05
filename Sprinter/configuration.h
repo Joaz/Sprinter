@@ -1,12 +1,38 @@
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
 
+// Shapercube specific options
+
+// Defines 'type' of Shapercube
+// 1 = Shapercube 2.0 or Shapercube 1.0/1.1 with Stepper Extruder & Ramps electronics
+// 2 = Shapercube 2.1
+#define SC_TYPE 1
+
+// SET ALL axis to 1/8 stepping by default. 
+// use 1, 2, 4, 8 or 16
+#define MICROSTEP_SETTING 8
+
+// RAMPS Version
+// Leave Commented for RAMPS 1.1 or 1.2
+// Uncomment for RAMPS 1.3
+#define RAMPS_V_1_3
+
+#if SC_TYPE == 1
+  #define Z_STEPS 320 // M8 
+#else
+  #define Z_STEPS 132 // TR12x3 leadscrew
+#endif
+
+
+
+// Sprinter Settings
+
 // NO RS485/EXTRUDER CONTROLLER SUPPORT
 // PLEASE VERIFY PIN ASSIGNMENTS FOR YOUR CONFIGURATION!!!!!!!
 #define MOTHERBOARD 3 // ATMEGA168 = 0, SANGUINO = 1, MOTHERBOARD = 2, MEGA/RAMPS = 3, ATMEGA328 = 4, Gen6 = 5, Sanguinololu = 6
 
-//Comment out to disable SD support
-#define SDSUPPORT 1
+// Uncomment  to enable SD support
+// #define SDSUPPORT 1
 
 //Min step delay in microseconds. If you are experiencing missing steps, try to raise the delay microseconds, but be aware this
 // If you enable this, make sure STEP_DELAY_RATIO is disabled.
@@ -22,8 +48,8 @@
 //Acceleration settings
 #ifdef RAMP_ACCELERATION
 //X, Y, Z, E maximum start speed for accelerated moves. E default values are good for skeinforge 40+, for older versions raise them a lot.
-float max_start_speed_units_per_second[] = {25.0,25.0,0.2,10.0};
-long max_acceleration_units_per_sq_second[] = {1000,1000,50,10000}; // X, Y, Z and E max acceleration in mm/s^2 for printing moves or retracts
+float max_start_speed_units_per_second[] = {35.0,35.0,0.2,10.0};
+long max_acceleration_units_per_sq_second[] = {3000,3000,150,10000}; // X, Y, Z and E max acceleration in mm/s^2 for printing moves or retracts
 long max_travel_acceleration_units_per_sq_second[] = {500,500,50}; // X, Y, Z max acceleration in mm/s^2 for travel moves
 #endif
 
@@ -88,10 +114,10 @@ long max_travel_acceleration_units_per_sq_second[] = {500,500,50}; // X, Y, Z ma
 //Calibration variables
 const int NUM_AXIS = 4; // The axis order in all axis related arrays is X, Y, Z, E
 bool axis_relative_modes[] = {false, false, false, false};
-float axis_steps_per_unit[] = {80.376,80.376,3200/1.25,16}; // {X steps per unit, Y steps per unit, Z steps per unit, E steps per unit}
+float axis_steps_per_unit[] = {10*MICROSTEP_SETTING/2, 10*MICROSTEP_SETTING/2, Z_STEPS*MICROSTEP_SETTING/2, 60*MICROSTEP_SETTING/2}; // {X steps per unit, Y steps per unit, Z steps per unit, E steps per unit}
 //For SAE Prusa mendeel float z_steps_per_unit = should be 3200/1.411 for 5/16-18 rod and 3200/1.058 for 5/16-24
 //float axis_steps_per_unit[] = {10.047,10.047,833.398,0.706};
-float max_feedrate[] = {200000, 200000, 240, 500000}; //mmm, acceleration!
+float max_feedrate[] = {200000, 200000, 550, 500000}; //mmm, acceleration!
 
 //For Inverting Stepper Enable Pins (Active Low) use 0, Non Inverting (Active High) use 1
 const bool X_ENABLE_ON = 0;
@@ -135,12 +161,12 @@ const int Z_HOME_DIR = -1;
 
 //Endstop Settings
 #define ENDSTOPPULLUPS 1
-const bool ENDSTOPS_INVERTING = false;
+const bool ENDSTOPS_INVERTING = true;
 const bool min_software_endstops = false; //If true, axis won't move to coordinates less than zero.
 const bool max_software_endstops = true;  //If true, axis won't move to coordinates greater than the defined lengths below.
-const int X_MAX_LENGTH = 220;
-const int Y_MAX_LENGTH = 220;
-const int Z_MAX_LENGTH = 100;
+const int X_MAX_LENGTH = 200;
+const int Y_MAX_LENGTH = 200;
+const int Z_MAX_LENGTH = 185;
 
 #define BAUDRATE 115200
 
