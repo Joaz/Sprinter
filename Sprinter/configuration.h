@@ -153,8 +153,8 @@ const int Z_HOME_DIR = -1;
 //#include "BedThermistorTable_200k.h"
 
 //Identical thermistors on heater and bed - use this if you have no heated bed or if the thermistors are the same on both:
-#include "ThermistorTable_200k.h"
-//#include "ThermistorTable_100k.h"
+//#include "ThermistorTable_200k.h"
+#include "ThermistorTable_100k.h"
 //#include "ThermistorTable_mendelparts.h"
 #define BNUMTEMPS NUMTEMPS
 #define bedtemptable temptable
