@@ -2,7 +2,7 @@
 // Licence: GPL
 
 #include "Sprinter.h"
-#include "configuration.h"
+#include "Configuration.h"
 #include "pins.h"
 
 #ifdef SDSUPPORT
@@ -133,7 +133,7 @@ float tt = 0, bt = 0;
   int temp_iState_max = 100 * PID_INTEGRAL_DRIVE_MAX / PID_IGAIN;
 #endif
 #ifdef SMOOTHING
-  uint32_t nma = SMOOTHFACTOR * analogRead(TEMP_0_PIN);
+  uint32_t nma = 0;
 #endif
 #ifdef WATCHPERIOD
   int watch_raw = -1000;
@@ -450,7 +450,7 @@ inline void process_commands()
     {
       case 0: // G0 -> G1
       case 1: // G1
-        #ifdef DISABLE_CHECK_DURING_ACC || DISABLE_CHECK_DURING_MOVE || DISABLE_CHECK_DURING_TRAVEL
+        #if (defined DISABLE_CHECK_DURING_ACC) || (defined DISABLE_CHECK_DURING_MOVE) || (defined DISABLE_CHECK_DURING_TRAVEL)
           manage_heater();
         #endif
         get_coordinates(); // For X Y Z E F
@@ -471,71 +471,71 @@ inline void process_commands()
       case 28: //G28 Home all Axis one at a time
         saved_feedrate = feedrate;
         for(int i=0; i < NUM_AXIS; i++) {
-          destination[i] = 0;
-          current_position[i] = 0;
+          destination[i] = current_position[i];
         }
         feedrate = 0;
 
         home_all_axis = !((code_seen(axis_codes[0])) || (code_seen(axis_codes[1])) || (code_seen(axis_codes[2])));
 
-        if((home_all_axis) || (code_seen('X'))) {
-          if((X_MIN_PIN > -1 && X_HOME_DIR==-1) || (X_MAX_PIN > -1 && X_HOME_DIR==1)) {
+        if((home_all_axis) || (code_seen(axis_codes[0]))) {
+          if ((X_MIN_PIN > -1 && X_HOME_DIR==-1) || (X_MAX_PIN > -1 && X_HOME_DIR==1)){
             current_position[0] = 0;
             destination[0] = 1.5 * X_MAX_LENGTH * X_HOME_DIR;
             feedrate = max_start_speed_units_per_second[0] * 60;
             prepare_move();
           
             current_position[0] = 0;
-            destination[0] = -1 * X_HOME_DIR;
+            destination[0] = -5 * X_HOME_DIR;
             prepare_move();
           
             destination[0] = 10 * X_HOME_DIR;
             prepare_move();
           
-            current_position[0] = 0;
-            destination[0] = 0;
+            current_position[0] = (X_HOME_DIR == -1) ? 0 : X_MAX_LENGTH;
+            destination[0] = current_position[0];
             feedrate = 0;
           }
         }
         
-        if((home_all_axis) || (code_seen('X'))) {
-          if((Y_MIN_PIN > -1 && Y_HOME_DIR==-1) || (Y_MAX_PIN > -1 && Y_HOME_DIR==1)) {
+        if((home_all_axis) || (code_seen(axis_codes[1]))) {
+          if ((Y_MIN_PIN > -1 && Y_HOME_DIR==-1) || (Y_MAX_PIN > -1 && Y_HOME_DIR==1)){
             current_position[1] = 0;
             destination[1] = 1.5 * Y_MAX_LENGTH * Y_HOME_DIR;
             feedrate = max_start_speed_units_per_second[1] * 60;
             prepare_move();
           
             current_position[1] = 0;
-            destination[1] = -1 * Y_HOME_DIR;
+            destination[1] = -5 * Y_HOME_DIR;
             prepare_move();
           
             destination[1] = 10 * Y_HOME_DIR;
             prepare_move();
           
-            current_position[1] = 0;
-            destination[1] = 0;
+            current_position[1] = (Y_HOME_DIR == -1) ? 0 : Y_MAX_LENGTH;
+            destination[1] = current_position[1];
             feedrate = 0;
           }
         }
         
-        if((home_all_axis) || (code_seen('X'))) {
-          if((Z_MIN_PIN > -1 && Z_HOME_DIR==-1) || (Z_MAX_PIN > -1 && Z_HOME_DIR==1)) {
+        if((home_all_axis) || (code_seen(axis_codes[2]))) {
+          if ((Z_MIN_PIN > -1 && Z_HOME_DIR==-1) || (Z_MAX_PIN > -1 && Z_HOME_DIR==1)){
             current_position[2] = 0;
             destination[2] = 1.5 * Z_MAX_LENGTH * Z_HOME_DIR;
             feedrate = max_feedrate[2]/2;
             prepare_move();
           
             current_position[2] = 0;
-            destination[2] = -1 * Z_HOME_DIR;
+            destination[2] = -2 * Z_HOME_DIR;
             prepare_move();
           
             destination[2] = 10 * Z_HOME_DIR;
             prepare_move();
           
-            current_position[2] = 0;
-            destination[2] = 0;
+            current_position[2] = (Z_HOME_DIR == -1) ? 0 : Z_MAX_LENGTH;
+            destination[2] = current_position[2];
             feedrate = 0;
-          }
+          
+        }
         }
         
         feedrate = saved_feedrate;
@@ -666,16 +666,16 @@ inline void process_commands()
         if (code_seen('S')) target_bed_raw = temp2analogBed(code_value());
         break;
       case 105: // M105
-        #if (TEMP_0_PIN > -1) || defined (HEATER_USES_MAX6675)
+        #if (TEMP_0_PIN > -1) || defined (HEATER_USES_MAX6675)|| defined HEATER_USES_AD595
           tt = analog2temp(current_raw);
         #endif
-        #if TEMP_1_PIN > -1
+        #if TEMP_1_PIN > -1 || defined BED_USES_AD595
           bt = analog2tempBed(current_bed_raw);
         #endif
-        #if (TEMP_0_PIN > -1) || defined (HEATER_USES_MAX6675)
+        #if (TEMP_0_PIN > -1) || defined (HEATER_USES_MAX6675) || defined HEATER_USES_AD595
             Serial.print("ok T:");
             Serial.print(tt); 
-          #if TEMP_1_PIN > -1
+          #if TEMP_1_PIN > -1 || defined BED_USES_AD595
             Serial.print(" B:");
             Serial.println(bt); 
           #else
@@ -716,9 +716,7 @@ inline void process_commands()
           {
             tt=analog2temp(current_raw);
             Serial.print("T:");
-            Serial.println( tt );
-            Serial.print("ok T:");
-            Serial.print( tt ); 
+            Serial.print( tt );
             Serial.print(" B:");
             Serial.println( analog2temp(current_bed_raw) ); 
             codenum = millis(); 
@@ -788,6 +786,33 @@ inline void process_commands()
 	Serial.print("E:");
         Serial.println(current_position[3]);
         break;
+      case 119: // M119
+      	#if (X_MIN_PIN > -1)
+      	Serial.print("x_min:");
+        Serial.print((digitalRead(X_MIN_PIN)^ENDSTOPS_INVERTING)?"H ":"L ");
+      	#endif
+      	#if (X_MAX_PIN > -1)
+      	Serial.print("x_max:");
+        Serial.print((digitalRead(X_MAX_PIN)^ENDSTOPS_INVERTING)?"H ":"L ");
+      	#endif
+      	#if (Y_MIN_PIN > -1)
+      	Serial.print("y_min:");
+        Serial.print((digitalRead(Y_MIN_PIN)^ENDSTOPS_INVERTING)?"H ":"L ");
+      	#endif
+      	#if (Y_MAX_PIN > -1)
+      	Serial.print("y_max:");
+        Serial.print((digitalRead(Y_MAX_PIN)^ENDSTOPS_INVERTING)?"H ":"L ");
+      	#endif
+      	#if (Z_MIN_PIN > -1)
+      	Serial.print("z_min:");
+        Serial.print((digitalRead(Z_MIN_PIN)^ENDSTOPS_INVERTING)?"H ":"L ");
+      	#endif
+      	#if (Z_MAX_PIN > -1)
+      	Serial.print("z_max:");
+        Serial.print((digitalRead(Z_MAX_PIN)^ENDSTOPS_INVERTING)?"H ":"L ");
+      	#endif
+        Serial.println("");
+      	break;
       #ifdef RAMP_ACCELERATION
       //TODO: update for all axis, use for loop
       case 201: // M201
@@ -984,7 +1009,11 @@ void linear_move(unsigned long axis_steps_remaining[]) // make linear move with 
       }
     for(int i = 0; i < NUM_AXIS; i++)
       if(axis_steps_remaining[i] >0) {
-        new_axis_max_intervals[i] = slowest_start_axis_max_interval * axis_steps_remaining[slowest_start_axis] / axis_steps_remaining[i];
+        // multiplying slowest_start_axis_max_interval by axis_steps_remaining[slowest_start_axis]
+        // could lead to overflows when we have long distance moves (say, 390625*390625 > sizeof(unsigned long))
+        float steps_remaining_ratio = axis_steps_remaining[slowest_start_axis] / axis_steps_remaining[i];
+        new_axis_max_intervals[i] = slowest_start_axis_max_interval * steps_remaining_ratio;
+        
         if(i == primary_axis) {
           max_interval = new_axis_max_intervals[i];
           min_speed_steps_per_second = 100000000 / max_interval;
@@ -1238,6 +1267,7 @@ inline void manage_heater()
     current_raw = read_max6675();
   #endif
   #ifdef SMOOTHING
+  if (!nma) nma = SMOOTHFACTOR * current_raw;
   nma = (nma + current_raw) - (nma / SMOOTHFACTOR);
   current_raw = nma / SMOOTHFACTOR;
   #endif
@@ -1261,7 +1291,7 @@ inline void manage_heater()
         target_raw = 0;
     }
   #endif
-  #if (TEMP_0_PIN > -1) || defined (HEATER_USES_MAX66675)
+  #if (TEMP_0_PIN > -1) || defined (HEATER_USES_MAX6675) || defined (HEATER_USES_AD595)
     #ifdef PIDTEMP
       error = target_raw - current_raw;
       pTerm = (PID_PGAIN * error) / 100;
