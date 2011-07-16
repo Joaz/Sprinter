@@ -1,6 +1,35 @@
 #ifndef CONFIGURATION_H
 #define CONFIGURATION_H
 
+
+// Shapercube specific options
+
+// Defines 'type' of Shapercube
+// 1 = Shapercube 2.0 or Shapercube 1.0/1.1 with Stepper Extruder & Ramps electronics
+// 2 = Shapercube 2.1
+#define SC_TYPE 1
+
+// SET ALL axis to 1/8 stepping by default.
+// use 1, 2, 4, 8 or 16
+#define MICROSTEP_SETTING 16
+
+// RAMPS Version
+// Leave Commented for RAMPS 1.1 or 1.2
+// Uncomment for RAMPS 1.3
+#define RAMPS_V_1_3
+
+#if SC_TYPE == 1
+#define Z_STEPS 320 // M8
+#else
+#define Z_STEPS 132 // TR12x3 leadscrew
+#endif
+
+
+
+
+
+
+
 // BASIC SETTINGS: select your board type, thermistor type, axis scaling, and endstop configuration
 
 //// The following define selects which electronics board you have. Please choose the one that matches your setup
@@ -9,7 +38,11 @@
 // Gen6 = 5, 
 // Sanguinololu up to 1.1 = 6
 // Sanguinololu 1.2 and above = 62
-#define MOTHERBOARD 3 
+#ifdef RAMPS_V_1_3
+  #define MOTHERBOARD 33
+#else
+  #define MOTHERBOARD 3
+#endif
 
 //// Thermistor settings:
 // 1 is 100k thermistor
@@ -21,7 +54,9 @@
 
 //// Calibration variables
 // X, Y, Z, E steps per unit - Metric Prusa Mendel with Wade extruder:
-float axis_steps_per_unit[] = {80, 80, 3200/1.25,700}; 
+//float axis_steps_per_unit[] = {80, 80, 3200/1.25,700}; 
+float axis_steps_per_unit[] = {10*MICROSTEP_SETTING/2, 10*MICROSTEP_SETTING/2, Z_STEPS*MICROSTEP_SETTING/2, 60*MICROSTEP_SETTING/2}; // {X steps per unit, Y steps per unit, Z steps per unit, E steps per unit}
+
 // Metric Prusa Mendel with Makergear geared stepper extruder:
 //float axis_steps_per_unit[] = {80,80,3200/1.25,1380}; 
 
@@ -55,13 +90,13 @@ const bool DISABLE_E = false;
 
 // Inverting axis direction
 const bool INVERT_X_DIR = false;
-const bool INVERT_Y_DIR = false;
+const bool INVERT_Y_DIR = true;
 const bool INVERT_Z_DIR = true;
 const bool INVERT_E_DIR = false;
 
 //// ENDSTOP SETTINGS:
 // Sets direction of endstops when homing; 1=MAX, -1=MIN
-const int X_HOME_DIR = -1;
+const int X_HOME_DIR = 1;
 const int Y_HOME_DIR = -1;
 const int Z_HOME_DIR = -1;
 
