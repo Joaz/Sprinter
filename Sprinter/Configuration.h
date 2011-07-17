@@ -7,11 +7,11 @@
 // Defines 'type' of Shapercube
 // 1 = Shapercube 2.0 or Shapercube 1.0/1.1 with Stepper Extruder & Ramps electronics
 // 2 = Shapercube 2.1
-#define SC_TYPE 1
+#define SC_TYPE 2
 
 // SET ALL axis to 1/8 stepping by default.
 // use 1, 2, 4, 8 or 16
-#define MICROSTEP_SETTING 16
+#define MICROSTEP_SETTING 8
 
 // RAMPS Version
 // Leave Commented for RAMPS 1.1 or 1.2
@@ -63,13 +63,13 @@ float axis_steps_per_unit[] = {10*MICROSTEP_SETTING/2, 10*MICROSTEP_SETTING/2, Z
 //// Endstop Settings
 #define ENDSTOPPULLUPS 1 // Comment this out (using // at the start of the line) to disable the endstop pullup resistors
 // The pullups are needed if you directly connect a mechanical endswitch between the signal and ground pins.
-const bool ENDSTOPS_INVERTING = false; //set to true to invert the logic of the endstops
+const bool ENDSTOPS_INVERTING = true; //set to true to invert the logic of the endstops
 
 // This determines the communication speed of the printer
 #define BAUDRATE 115200
 
 // Comment out (using // at the start of the line) to disable SD support:
-#define SDSUPPORT 1
+//#define SDSUPPORT 1
 
 
 //// ADVANCED SETTINGS - to tweak parameters
@@ -96,19 +96,19 @@ const bool INVERT_E_DIR = false;
 
 //// ENDSTOP SETTINGS:
 // Sets direction of endstops when homing; 1=MAX, -1=MIN
-const int X_HOME_DIR = 1;
-const int Y_HOME_DIR = -1;
+const int X_HOME_DIR = -1;
+const int Y_HOME_DIR = 1;
 const int Z_HOME_DIR = -1;
 
 const bool min_software_endstops = false; //If true, axis won't move to coordinates less than zero.
 const bool max_software_endstops = true;  //If true, axis won't move to coordinates greater than the defined lengths below.
-const int X_MAX_LENGTH = 200;
-const int Y_MAX_LENGTH = 200;
-const int Z_MAX_LENGTH = 100;
+const int X_MAX_LENGTH = 190;
+const int Y_MAX_LENGTH = 190;
+const int Z_MAX_LENGTH = 180;
 
 //// MOVEMENT SETTINGS
 const int NUM_AXIS = 4; // The axis order in all axis related arrays is X, Y, Z, E
-float max_feedrate[] = {200000, 200000, 240, 500000};
+float max_feedrate[] = {200000, 200000, 500, 500000};
 bool axis_relative_modes[] = {false, false, false, false};
 
 // Min step delay in microseconds. If you are experiencing missing steps, try to raise the delay microseconds, but be aware this
