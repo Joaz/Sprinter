@@ -50,7 +50,7 @@
 // 3 is mendel-parts thermistor
 // 4 is 10k thermistor
 #define THERMISTORHEATER 1
-#define THERMISTORBED 1
+//#define THERMISTORBED 1
 
 //// Calibration variables
 // X, Y, Z, E steps per unit - Metric Prusa Mendel with Wade extruder:
@@ -181,7 +181,7 @@ long max_travel_acceleration_units_per_sq_second[] = {500,500,50,500}; // X, Y, 
 //#define HEATER_USES_MAX6675
 
 // Select one of these only to define how the bed temp is read.
-#define BED_USES_THERMISTOR
+//#define BED_USES_THERMISTOR
 //#define BED_USES_AD595
 
 // Uncomment the following line to enable debugging. You can better control debugging below the following line
