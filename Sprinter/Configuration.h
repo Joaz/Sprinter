@@ -108,7 +108,11 @@ const int Z_MAX_LENGTH = 180;
 
 //// MOVEMENT SETTINGS
 const int NUM_AXIS = 4; // The axis order in all axis related arrays is X, Y, Z, E
-float max_feedrate[] = {200000, 200000, 500, 500000};
+#if SC_TYPE == 1
+    float max_feedrate[] = {200000, 200000, 240, 500000};
+#else
+    float max_feedrate[] = {200000, 200000, 500, 500000};
+#endif
 bool axis_relative_modes[] = {false, false, false, false};
 
 // Min step delay in microseconds. If you are experiencing missing steps, try to raise the delay microseconds, but be aware this
