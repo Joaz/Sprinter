@@ -21,7 +21,7 @@
 #if SC_TYPE == 1
 #define Z_STEPS 320 // M8
 #else
-#define Z_STEPS 132 // TR12x3 leadscrew
+#define Z_STEPS 400.0/3 // TR12x3 leadscrew
 #endif
 
 
